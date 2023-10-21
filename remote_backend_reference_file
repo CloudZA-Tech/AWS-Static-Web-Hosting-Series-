@@ -1,0 +1,79 @@
+# IAM User for Terraform
+resource "aws_iam_user" "" {
+  name =
+}
+
+# Attach AdministratorAccess policy to the IAM user
+resource "aws_iam_user_policy_attachment" "" {
+  policy_arn = "arn:aws:iam::aws:policy/AdministratorAccess"
+  user       =
+}
+
+# S3 Bucket for Terraform state
+resource "aws_s3_bucket" "" {
+  bucket =
+
+  lifecycle {
+    prevent_destroy =
+  }
+
+  tags = {
+    Name    = ""
+  }
+}
+
+# Enable versioning for the S3 bucket
+resource "aws_s3_bucket_versioning" "" {
+  bucket =
+
+  versioning_configuration {
+    status = ""
+  }
+}
+
+# S3 Bucket Policy
+resource "aws_s3_bucket_policy" "" {
+  bucket =
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = "s3:ListBucket",
+        Resource =
+        Principal = {
+          AWS =
+        }
+      },
+      {
+        Effect   = "Allow",
+        Action   = ["s3:GetObject", "s3:PutObject"],
+        Resource = "${}/*",
+        Principal = {
+          AWS =
+        }
+      }
+    ]
+  })
+}
+
+# DynamoDB Table for state locking
+resource "aws_dynamodb_table" "" {
+  name         =
+  billing_mode = ""
+  hash_key     = ""
+
+  attribute {
+    name = ""
+    type = ""
+  }
+
+  lifecycle {
+    prevent_destroy =
+  }
+
+  tags = {
+    Name    = "State Lock Table"
+  }
+}
