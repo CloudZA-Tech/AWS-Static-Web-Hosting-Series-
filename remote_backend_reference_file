@@ -74,6 +74,6 @@ resource "aws_dynamodb_table" "" {
   }
 
   tags = {
-    Name    = "State Lock Table"
+    Name    = ""
   }
 }
