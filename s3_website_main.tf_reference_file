@@ -1,0 +1,44 @@
+resource "aws_s3_bucket" "" {
+  bucket =
+
+  tags = {
+    Name =
+  }
+}
+
+resource "aws_s3_bucket_versioning" "" {
+  bucket =
+
+  versioning_configuration {
+    status =
+  }
+}
+
+resource "aws_s3_bucket_website_configuration" "" {
+  bucket =
+
+  index_document {
+    suffix =
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "" {
+  bucket =
+
+  block_public_policy =
+}
+
+resource "aws_s3_bucket_policy" "" {
+  bucket 
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action    = ["s3:GetObject"],
+        Effect    = "Allow",
+        Resource  =
+        Principal =
+      },
+    ]
+  })
+}
