@@ -26,10 +26,10 @@ resource "aws_s3_bucket_website_configuration" "" {
 resource "aws_s3_bucket_public_access_block" "" {
   bucket =
 
-  block_public_acls   = false
-  block_public_policy = false
-  ignore_public_acls  = false
-  restrict_public_buckets = false
+  block_public_acls   =
+  block_public_policy =
+  ignore_public_acls  =
+  restrict_public_buckets =
 }
 
 resource "aws_s3_bucket_policy" "" {
@@ -45,4 +45,7 @@ resource "aws_s3_bucket_policy" "" {
       },
     ]
   })
+}
+
+  depends_on =
 }
