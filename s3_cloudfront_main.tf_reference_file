@@ -65,7 +65,7 @@ resource "aws_s3_bucket_policy" "" {
   })
 }
 
-resource "aws_route53_record" "cloudfront_alias_record" {
+resource "aws_route53_record" "" {
     zone_id =
     name    =
     type    =
