@@ -3,6 +3,37 @@
 <h1 align="center">Static Web Hosting on AWS Series: Terraform Modules & GitHub Actions</h1>
 <h3 align="center"> The Codebase For The 6 Part Youtube Series</h3>
 
+## The Series (6 Parts)
+
+🔗 [View The Playlist Here!](https://youtube.com/playlist?list=PLfmMgg_VrrlAz4s0UxLCdgZlcw2iCqVrD&si=p3g4-633yGeX12wQ)
+
+## Overview
+
+Welcome to the the central hub for all Terraform module templates and GitHub Action YAML files needed for this extensive six-part project.
+
+This series streamlines learning infrastructure as code with Terraform and automating web deployments via GitHub Actions. Dive into deploying a full static website infrastructure, managing DNS, SSL, S3 hosting, and CloudFront distribution with Terraform.
+
+In six parts, you'll master efficient Terraform coding, exploring variables, outputs, and modules. Each of the four key modules builds on the fundamentals of web infrastructure management and demonstrates their interconnectedness to boost your infrastructure. Modules include:
+
+1. S3 Remote Backend
+2. DNS settings with Route 53 & AWS ACM
+3. S3 Website Hosting
+4. CloudFront distribution
+
+You'll learn how to implement a CI/CD pipeline using GitHub Actions. You'll create a workflow with the following jobs:
+
+1. Deploying your infrastructure with Terraform
+2. Syncing your files to an S3 bucket
+3. Invalidating your CloudFront cache
+
+Whenever you make changes to your website, simply update your content and commit the changes to your repository. The CI/CD pipeline, integrated into this Terraform-managed infrastructure, automatically kicks in. It syncs the new content to the S3 bucket and triggers a CloudFront cache invalidation, ensuring that your website reflects the latest updates promptly.
+
+![Architecture Diagram](img/pipeline.png)
+
+## Explore The Full Project
+
+[Visit The Complete GitHub Repository](https://github.com/digitalden3/Static-Web-Hosting-on-AWS-Terraform-Modules-GitHub-Actions) for the full project and all the complete code for the 'Static Web Hosting on AWS Series: Terraform Modules & GitHub Actions'.
+
 ## Tech Stack
 
 - Terraform
@@ -13,34 +44,3 @@
 - AWS ACM
 - AWS Route 53
 - Amazon CloudFront
-
-## The Series (6 Parts)
-
-🔗 [Watch Now!](https://youtube.com/playlist?list=PLfmMgg_VrrlAz4s0UxLCdgZlcw2iCqVrD&si=p3g4-633yGeX12wQ)
-
-## Overivew
-
-Welcome to the comprehensive GitHub repository, the central hub for all Terraform reference files and GitHub Action YAML files needed for this extensive six-part project.
-
-This project involves creating a CI/CD Pipeline using Terraform and GitHub Actions. You'll build 4 Terraform modules:
-
-1. S3 Remote Backend: Set up remote storage for Terraform state files in an S3 bucket.
-2. Route 53 and AWS ACM for DNS Settings: Configure DNS settings using AWS Route 53 and obtain an SSL certificate from AWS Certificate Manager for secure HTTPS connections.
-3. S3 Website Hosting: Host your website on an S3 bucket.
-4. CloudFront Distribution: Distribute your website content globally using CloudFront, Amazon's CDN service.
-
-Your website will be deployed to an S3 bucket, which acts as the origin server. An Origin Access Control (OAC) will be used to restrict direct access to the S3 bucket, ensuring users access the content through CloudFront. You'll connect your domain name to this setup, enabling a user-friendly URL and HTTPS for secure browsing.
-
-Additionally, you'll create a CI/CD pipeline with GitHub Actions, consisting of three main jobs:
-
-1. Terraform Job: Deploys your infrastructure.
-2. GitHub Action to Sync Files: Synchronizes your website files to the S3 bucket.
-3. GitHub Action to Invalidate CloudFront Cache: Clears the CloudFront cache to ensure updated content is served
-
-![Architecture Diagram](img/pipeline.png)
-
-Every time you push website changes to GitHub, this workflow is triggered automatically. This makes the update process efficient as it removes the need to manually update the S3 bucket and clear the CloudFront cache, ensuring live changes are visible immediately.
-
-The 6 Part Series shows you every step from the beginning. You'll also learn how to write Terraform code, including using variables, outputs, and how to create modules to keep your code clean and organized. This is key for managing your infrastructure efficiently. The CI/CD pipeline part makes website updates automatic and fast.
-
-🔗 **Find the Complete Project**: Visit the GitHub repository [here](https://github.com/digitalden3/Static-Web-Hosting-on-AWS-Terraform-Modules-GitHub-Actions) for the full project and all the necessary code for the 'Static Web Hosting on AWS Series: Terraform Modules & GitHub Actions'.
