@@ -23,7 +23,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: eu-west-1
           
       # Skip Terraform for now since we're using existing resources
       - name: Skip Terraform
@@ -51,7 +51,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: eu-west-1
           
       - name: Verify AWS Credentials
         run: |
@@ -83,7 +83,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: eu-west-1
 
       - name: Invalidate CloudFront
         run: |
