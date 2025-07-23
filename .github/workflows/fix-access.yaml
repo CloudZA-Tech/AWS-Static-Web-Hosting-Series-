@@ -1,0 +1,61 @@
+name: Fix Access
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  fix_access:
+    name: Fix Access Issues
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-west-1
+
+      - name: Check S3 Bucket Policy
+        run: |
+          echo "Checking S3 bucket policy..."
+          aws s3api get-bucket-policy --bucket ${{ secrets.S3_BUCKET_NAME }} --output json
+
+      - name: Update S3 Bucket Policy
+        run: |
+          echo "Updating S3 bucket policy..."
+          cat > policy.json << 'EOL'
+          {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Sid": "AllowCloudFrontServicePrincipal",
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": "cloudfront.amazonaws.com"
+                },
+                "Action": "s3:GetObject",
+                "Resource": "arn:aws:s3:::${{ secrets.S3_BUCKET_NAME }}/*",
+                "Condition": {
+                  "StringEquals": {
+                    "AWS:SourceArn": "arn:aws:cloudfront::459573696753:distribution/${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}"
+                  }
+                }
+              }
+            ]
+          }
+          EOL
+          aws s3api put-bucket-policy --bucket ${{ secrets.S3_BUCKET_NAME }} --policy file://policy.json
+
+      - name: Check CloudFront Origin Access Control
+        run: |
+          echo "Checking CloudFront Origin Access Control..."
+          aws cloudfront list-origin-access-controls --output json
+
+      - name: Invalidate CloudFront Cache
+        run: |
+          echo "Invalidating CloudFront cache..."
+          aws cloudfront create-invalidation --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --paths "/*"
