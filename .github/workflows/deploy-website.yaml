@@ -58,7 +58,10 @@ jobs:
       - name: Sync files to S3
         run: |
           echo "Syncing files to S3..."
-          aws s3 sync ./website_assets s3://${{ secrets.S3_BUCKET_NAME }} --delete --acl private
+          echo "Listing files to be uploaded:"
+          find ./website_assets -type f | sort
+          echo "Running S3 sync with debug output:"
+          aws s3 sync ./website_assets s3://${{ secrets.S3_BUCKET_NAME }} --delete --acl private --debug
 
   Invalidate_CloudFront:
     name: Invalidate CloudFront Distribution
