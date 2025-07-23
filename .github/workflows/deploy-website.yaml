@@ -37,6 +37,16 @@ jobs:
       - name: Checkout Repo
         uses: actions/checkout@v3
 
+      - name: Check directory structure
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Directory listing:"
+          ls -la
+          echo "Website assets directory:"
+          ls -la website_assets || echo "website_assets directory not found"
+          echo "Website assets subdirectories:"
+          find website_assets -type d | sort || echo "No subdirectories found"
+
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
