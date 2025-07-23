@@ -1,0 +1,45 @@
+name: Direct Upload
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  upload:
+    name: Direct Upload to S3
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Upload index.html directly
+        run: |
+          echo "Uploading index.html directly..."
+          aws s3 cp ./website_assets/index.html s3://${{ secrets.S3_BUCKET_NAME }}/index.html --acl private
+
+      - name: Upload test.html directly
+        run: |
+          echo "Uploading test.html directly..."
+          aws s3 cp ./website_assets/test.html s3://${{ secrets.S3_BUCKET_NAME }}/test.html --acl private
+
+      - name: Upload CSS file
+        run: |
+          echo "Uploading CSS file..."
+          aws s3 cp ./website_assets/resources/css/style.css s3://${{ secrets.S3_BUCKET_NAME }}/resources/css/style.css --acl private
+
+      - name: Upload images
+        run: |
+          echo "Uploading images..."
+          aws s3 cp ./website_assets/resources/images/AWSLogo.png s3://${{ secrets.S3_BUCKET_NAME }}/resources/images/AWSLogo.png --acl private
+          aws s3 cp ./website_assets/resources/images/digitalden_purple.png s3://${{ secrets.S3_BUCKET_NAME }}/resources/images/digitalden_purple.png --acl private
+          aws s3 cp ./website_assets/resources/images/digitalden.png s3://${{ secrets.S3_BUCKET_NAME }}/resources/images/digitalden.png --acl private
