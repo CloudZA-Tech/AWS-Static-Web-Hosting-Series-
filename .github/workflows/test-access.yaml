@@ -1,0 +1,39 @@
+name: Test Access
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  test_access:
+    name: Test Access to Resources
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: eu-west-1
+
+      - name: Test S3 Access
+        run: |
+          echo "Testing S3 access..."
+          echo "test content" > test.txt
+          aws s3 cp test.txt s3://${{ secrets.S3_BUCKET_NAME }}/test.txt
+          aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }}/
+          
+      - name: Test CloudFront Origin Access
+        run: |
+          echo "Testing CloudFront Origin Access..."
+          DOMAIN=$(aws cloudfront get-distribution --id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --query "Distribution.DomainName" --output text)
+          echo "CloudFront Domain: $DOMAIN"
+          curl -v https://$DOMAIN/test.txt || echo "Failed to access via CloudFront"
+          
+      - name: Check CloudFront Cache Behavior
+        run: |
+          echo "Checking CloudFront Cache Behavior..."
+          aws cloudfront get-distribution-config --id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} --query "DistributionConfig.DefaultCacheBehavior" --output json
