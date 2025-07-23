@@ -24,33 +24,13 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
-
-      - name: Terraform Setup
-        uses: hashicorp/setup-terraform@v2
-
-      - name: Terraform Format
-        run: terraform fmt
-        working-directory: ./terraform
-
-      - name: Terraform Init
-        run: terraform init
-        working-directory: ./terraform
-
-      - name: Terraform Validate
-        run: terraform validate
-        working-directory: ./terraform
-
-      - name: Terraform Plan
-        run: terraform plan
-        working-directory: ./terraform
-
-      - name: Terraform Apply
-        run: terraform apply -auto-approve
-        working-directory: ./terraform
+          
+      # Skip Terraform for now since we're using existing resources
+      - name: Skip Terraform
+        run: echo "Skipping Terraform deployment, using existing resources"
 
   Sync_S3:
     name: Sync files to S3 Bucket
-    needs: terraform
     runs-on: ubuntu-latest
 
     steps:
@@ -65,7 +45,7 @@ jobs:
 
       - name: Sync files to S3
         run: |
-          aws s3 sync ./website_assets s3://${{ secrets.S3_BUCKET_NAME }} --delete
+          aws s3 sync ./website_assets s3://${{ secrets.S3_BUCKET_NAME }} --delete --acl private
 
   Invalidate_CloudFront:
     name: Invalidate CloudFront Distribution

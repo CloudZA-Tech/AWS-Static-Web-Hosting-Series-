@@ -6,25 +6,46 @@ resource "aws_cloudfront_origin_access_control" "oac" {
     signing_protocol                  = "sigv4"
 }
 
+# Use data source to reference existing CloudFront distribution
+data "aws_cloudfront_distribution" "existing" {
+  id = "E1ZN3HIGD83NPO"
+}
+
+# Empty resource to maintain references in the code
 resource "aws_cloudfront_distribution" "website_distribution" {
-    enabled             = true
-    is_ipv6_enabled     = true
+    count = 0
+    enabled = true
     default_root_object = "index.html"
-    aliases             = [var.domain_name, "www.${var.domain_name}"]
-    # Use existing CloudFront distribution if available
-    count               = 0 # Set to 0 to use existing distribution
-    
-    # Uncomment and use this if you want to create a new distribution
-    # enabled             = true
-    # is_ipv6_enabled     = true
-    # default_root_object = "index.html"
-    # aliases             = [var.domain_name, "www.${var.domain_name}"]
     
     origin {
-        domain_name = var.bucket_regional_domain_name
-        origin_id   = var.bucket_name
-        origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
+        domain_name = "example.com"
+        origin_id   = "example"
     }
+    
+    default_cache_behavior {
+        allowed_methods  = ["GET", "HEAD"]
+        cached_methods   = ["GET", "HEAD"]
+        target_origin_id = "example"
+        viewer_protocol_policy = "redirect-to-https"
+        
+        forwarded_values {
+            query_string = false
+            cookies {
+                forward = "none"
+            }
+        }
+    }
+    
+    restrictions {
+        geo_restriction {
+            restriction_type = "none"
+        }
+    }
+    
+    viewer_certificate {
+        cloudfront_default_certificate = true
+    }
+}
 
     default_cache_behavior {
         allowed_methods  = ["GET", "HEAD"]
@@ -64,8 +85,8 @@ resource "aws_s3_bucket_policy" "cloudfront_bucket_policy" {
         Action   = "s3:GetObject"
         Resource = "arn:aws:s3:::${var.bucket_name}/*"
         Condition = {
-          StringEquals = {
-            "AWS:SourceArn" = aws_cloudfront_distribution.website_distribution.arn
+          ArnLike = {
+            "AWS:SourceArn" = "arn:aws:cloudfront::459573696753:distribution/E1ZN3HIGD83NPO"
           }
         }
       }
@@ -79,8 +100,8 @@ resource "aws_route53_record" "website_domain" {
     type    = "A"
 
     alias {
-        name                   = aws_cloudfront_distribution.website_distribution.domain_name
-        zone_id                = aws_cloudfront_distribution.website_distribution.hosted_zone_id
+        name                   = data.aws_cloudfront_distribution.existing.domain_name
+        zone_id                = data.aws_cloudfront_distribution.existing.hosted_zone_id
         evaluate_target_health = false
     }
 }
@@ -91,8 +112,8 @@ resource "aws_route53_record" "www_domain" {
     type    = "A"
 
     alias {
-        name                   = aws_cloudfront_distribution.website_distribution.domain_name
-        zone_id                = aws_cloudfront_distribution.website_distribution.hosted_zone_id
+        name                   = data.aws_cloudfront_distribution.existing.domain_name
+        zone_id                = data.aws_cloudfront_distribution.existing.hosted_zone_id
         evaluate_target_health = false
     }
 }
