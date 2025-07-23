@@ -1,0 +1,84 @@
+name: Deploy Website
+
+on:
+  push:
+    branches:
+      - main
+      - '*'  # Run on all branches
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform:
+    name: Deploy Infrastructure
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::459573696753:role/OIDC-cicd-static-provider
+          aws-region: us-east-1
+
+      - name: Terraform Setup
+        uses: hashicorp/setup-terraform@v2
+
+      - name: Terraform Format
+        run: terraform fmt
+        working-directory: ./terraform
+
+      - name: Terraform Init
+        run: terraform init
+        working-directory: ./terraform
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ./terraform
+
+      - name: Terraform Plan
+        run: terraform plan
+        working-directory: ./terraform
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve
+        working-directory: ./terraform
+
+  Sync_S3:
+    name: Sync files to S3 Bucket
+    needs: terraform
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::459573696753:role/OIDC-cicd-static-provider
+          aws-region: us-east-1
+
+      - name: Sync files to S3
+        run: |
+          aws s3 sync ./website_assets s3://static-website-test-cz1 --delete
+
+  Invalidate_CloudFront:
+    name: Invalidate CloudFront Distribution
+    needs: Sync_S3
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::459573696753:role/OIDC-cicd-static-provider
+          aws-region: us-east-1
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation --distribution-id E1ZN3HIGD83NPO --paths "/*"
