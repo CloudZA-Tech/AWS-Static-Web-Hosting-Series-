@@ -42,9 +42,22 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
+          
+      - name: Verify AWS Credentials
+        run: |
+          echo "Checking AWS identity..."
+          aws sts get-caller-identity
+          echo "Checking IAM permissions..."
+          aws iam get-role --role-name OIDC-cicd-static-provider || echo "Failed to get role info"
+          echo "Listing S3 bucket..."
+          aws s3 ls s3://${{ secrets.S3_BUCKET_NAME }} || echo "Failed to list bucket"
+          echo "Testing S3 permissions..."
+          echo "test" > test.txt
+          aws s3 cp test.txt s3://${{ secrets.S3_BUCKET_NAME }}/test.txt || echo "Failed to upload test file"
 
       - name: Sync files to S3
         run: |
+          echo "Syncing files to S3..."
           aws s3 sync ./website_assets s3://${{ secrets.S3_BUCKET_NAME }} --delete --acl private
 
   Invalidate_CloudFront:
